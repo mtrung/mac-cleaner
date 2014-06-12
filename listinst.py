@@ -120,11 +120,6 @@ def listAppFiles(app):
     print titlePrintStr
 
     if gHtmlTable:
-        print "<style type=\"text/css\"> \
-            .myTable { background-color:#eee;border-collapse:collapse; } \
-            .myTable th { background-color:#3f89de;color:white;; } \
-            .myTable td, .myTable th { padding:5px;border:1px solid #000; } \
-            </style>"
         print "<table class='myTable'>"
         print "<tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr>" % ('dir', 'Size', 'Usage', 'File')
  
@@ -218,6 +213,12 @@ cli()
 print "List installed files"
 print "==="
 
+if gHtmlTable:
+    print "<style type=\"text/css\"> \
+        .myTable { background-color:#eee;border-collapse:collapse; } \
+        .myTable th { background-color:#3f89de;color:white;; } \
+        .myTable td, .myTable th { padding:5px;border:1px solid #000; } \
+        </style>"
 
 for app in gAppList:
     listAppFiles(app)
