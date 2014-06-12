@@ -1,8 +1,9 @@
 #!/bin/bash
+# obsolete use listinst.py
 
 listInstalledFiles()
 {
-echo -----------------
+echo "### $1 by $2"
 ls ~/Library/Application\ Support/$1
 ls /Library/Application\ Support/$1
 
@@ -15,7 +16,7 @@ echo Caches 2
 ls ~/Library/Caches/com.$2.*
 
 ls ~/Library/Saved\ Application\ State/com.$2.*
-echo -----------------
+echo " "
 }
 
 
