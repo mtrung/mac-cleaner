@@ -8,10 +8,10 @@ import glob
 import argparse
 import json
 import sys
-
-__author__ = 'Trung Vo'
+import subprocess
 
 # const
+__author__ = 'Trung Vo'
 SizeUnitArray = [(2.0**30,'GB'), (2.0**20,'MB'), (2.0**10,'KB'), (1.0,'bytes')]
 USER_PATH = os.path.expanduser("~")
 
@@ -41,6 +41,9 @@ def get_size(start_path = '.'):
                 total_size += os.path.getsize(fp)
     return total_size
 
+# Accurate approach
+# Recursively calculate size of a folder (or file)
+# return size in bytes
 def getFolderSize(folder):
     total_size = os.path.getsize(folder)
     if not os.path.isdir(folder):
@@ -67,6 +70,15 @@ def getSizeWithUnit(size):
         return "%d %s" % (size, foundUnit[1])
     return "%.2f %s" % (size/foundUnit[0], foundUnit[1])
 
+# Inaccurate approach: using shell cmd: du
+# return string
+def getFileSizeUsingDu(filename):
+    cmd = "du -sh '" + filename + "'"
+    #df = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    #output = df.communicate()[0]
+    output = subprocess.check_output(cmd, shell=True)
+    output = output.split()[0]
+    return output
 
 def printWildcardFolderSizes(wildcardFolderStr):
     listing = glob.glob(wildcardFolderStr)
@@ -85,10 +97,13 @@ def printWildcardFolderSizes(wildcardFolderStr):
         if size > gAlertThreshold:
             indicator = '*'                
 
+        sizeStr = getSizeWithUnit(size)
+        sizeStr2 = getFileSizeUsingDu(filename)
+
         if gHtmlTable:
-            print "<tr><td>%s</td><td>%s</td><td>%s %s</td></tr>" % (dirIndicator, getSizeWithUnit(size), indicator, filename)
+            print "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s %s</td></tr>" % (dirIndicator, sizeStr, sizeStr2, indicator, filename)
         else:
-            print "%s %s\t%s %s" % (dirIndicator, getSizeWithUnit(size), indicator, filename)
+            print "%s %s\t%s\t%s %s" % (dirIndicator, sizeStr, sizeStr2, indicator, filename)
     
 
 # list app installed files in known locations
@@ -116,6 +131,7 @@ def listAppFiles(app):
             USER_PATH+'/Library/Application Support/'+appName,
             USER_PATH+'/Library/Caches/'+appName,
             USER_PATH+'/Library/'+appName,
+            USER_PATH+'/.'+appName.lower(),
         ]
         for wildcardFolderStr in wildcardFolderStrs:
             printWildcardFolderSizes(wildcardFolderStr)        
@@ -124,10 +140,12 @@ def listAppFiles(app):
         if (app.has_key('companywildcard') == False) or (app['companywildcard'] == True):
             companyName = companyName + '*'        
         wildcardFolderStrs = [
-            '/Library/Preferences/com.'+companyName,
-            USER_PATH+'/Library/Preferences/com.'+companyName,
-            USER_PATH+'/Library/Caches/com.'+companyName,
-            USER_PATH+'/Library/Saved Application State/com.'+companyName,
+            '/Library/Preferences/*.'+companyName,
+            USER_PATH+'/Library/Preferences/*.'+companyName,
+            USER_PATH+'/Library/Caches/*.'+companyName,
+            USER_PATH+'/Library/Saved Application State/*.'+companyName,
+            # Mac App Store
+            USER_PATH+'/Library/Containers/*.'+companyName,            
         ]
         for wildcardFolderStr in wildcardFolderStrs:
             printWildcardFolderSizes(wildcardFolderStr)
@@ -163,9 +181,9 @@ def handleUserAppList(appList):
 
 # command line interface
 def cli():
-    parser = argparse.ArgumentParser(prog='ListInstalled', description='List app installed files. Output is in Markdown format.')
+    parser = argparse.ArgumentParser(prog=__file__, description='List app installed files. Output is in Markdown format.')
     parser.add_argument('-t','--htmltable', help='Use HTML table tag for output', action='store_true')
-    parser.add_argument('-at','--alert_threshold',help='Print * for file/folder size > alert_threshold in MB')
+    parser.add_argument('-at','--alert_threshold',help='Print "*" for file/folder size > alert_threshold. Unit is in MB')
     parser.add_argument('-i','--input',help='Input JSON file containing list of apps')
     parser.add_argument('apps', nargs='*', help='List of app names')
     args = parser.parse_args()
