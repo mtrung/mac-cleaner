@@ -15,6 +15,7 @@
    {
       "name": "NetBeans"
    }, 
+   { "name": "Android" },   
    { "name": "m2" },   
    { "name": "gradle" }
 ]

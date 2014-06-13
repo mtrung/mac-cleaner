@@ -14,10 +14,17 @@ import subprocess
 __author__ = 'Trung Vo'
 SizeUnitArray = [(2.0**30,'GB'), (2.0**20,'MB'), (2.0**10,'KB'), (1.0,'bytes')]
 USER_PATH = os.path.expanduser("~")
+gSearchOptionDict = { 
+    "contain":"*%s*",
+    "match"  :"%s",
+    "startWith" :"%s*",
+    "endWith"   :"*%s"
+}
 
 #default
 gAlertThreshold = 500*SizeUnitArray[1][0]
 gHtmlTable = False
+gSearchOption = "startWith"
 gAppList = [
     {'name':"TurboTax", 'company':"intuit"},
     #{'name':"TurboTax 2013", 'company':"intuit.TurboTax.2013", 'namewildcard':False, 'companywildcard':True},
@@ -82,10 +89,10 @@ def getFileSizeUsingDu(filename):
 
 def printWildcardFolderSizes(wildcardFolderStr):
     listing = glob.glob(wildcardFolderStr)
-    #print "count=", len(listing)
     if (listing is None) or (len(listing) == 0):
         #print "  " + wildcardFolderStr + " not found"
         return
+    #print wildcardFolderStr + " - ", len(listing)
 
     for filename in listing:
         size = getFolderSize(filename)
@@ -110,6 +117,18 @@ def printWildcardFolderSizes(wildcardFolderStr):
             print "%s %s %s\t%s\t%s" % (dirIndicator, alertFormat, sizeStr, sizeStr2, filename)
     
 
+# getSearchString: using 2 tier approach: app level & global level
+def getSearchString(app, appKey, appSearchKey):
+    # use app search option
+    if (app.has_key(appSearchKey) == True):
+        searchOptionKey = app[appSearchKey]
+        if gSearchOptionDict.has_key(searchOptionKey):
+            return gSearchOptionDict[searchOptionKey] % (app[appKey])
+
+    # use global search option
+    return gSearchOptionDict[gSearchOption] % (app[appKey])
+
+
 # list app installed files in known locations
 # input: app dictionary
 def listAppFiles(app):
@@ -129,8 +148,7 @@ def listAppFiles(app):
  
 
     if appName != "":
-        if (app.has_key('namewildcard') == False) or (app['namewildcard'] == True):
-            appName = appName + '*'
+        appName = getSearchString(app, "name", "nameSearchOption")
         wildcardFolderStrs = [
             '/Applications/'+appName,
             '/Library/Application Support/'+appName,
@@ -143,8 +161,7 @@ def listAppFiles(app):
             printWildcardFolderSizes(wildcardFolderStr)        
 
     if companyName != "":
-        if (app.has_key('companywildcard') == False) or (app['companywildcard'] == True):
-            companyName = companyName + '*'        
+        companyName = getSearchString(app, "company", "companySearchOption")
         wildcardFolderStrs = [
             '/Library/Preferences/*.'+companyName,
             USER_PATH+'/Library/Preferences/*.'+companyName,
@@ -189,8 +206,9 @@ def handleUserAppList(appList):
 def cli():
     parser = argparse.ArgumentParser(prog=__file__, description='List app installed files. Output is in Markdown format.')
     parser.add_argument('-t','--htmltable', help='Use HTML table tag for output', action='store_true')
-    parser.add_argument('-at','--alert_threshold',help='Print "*" for file/folder size > alert_threshold. Unit is in MB')
+    parser.add_argument('-at','--alert_threshold',help='Highlight file/folder exceeding alert threshold (in MB).')
     parser.add_argument('-i','--input',help='Input JSON file containing list of apps')
+    parser.add_argument('-s','--search_option',help='Allow user to set search option. Options are ' + str(gSearchOptionDict.keys()))    
     parser.add_argument('apps', nargs='*', help='List of app names')
     args = parser.parse_args()
 
@@ -200,6 +218,11 @@ def cli():
     global gHtmlTable
     gHtmlTable = args.htmltable
     print "- HtmlTable: ", gHtmlTable
+
+    if gSearchOptionDict.has_key(args.search_option) == True:
+        global gSearchOption
+        gSearchOption = args.search_option
+        print "- Search option: " + gSearchOption
 
     if not args.alert_threshold is None:
         global gAlertThreshold
@@ -215,7 +238,7 @@ def cli():
 cli()
 #sys.exit()
 
-# table formatting
+# html table formatting
 if gHtmlTable:
     print """\n<style type=\"text/css\">
 .myTable { background-color:#eee;border-collapse:collapse; }
