@@ -207,18 +207,20 @@ def cli():
     print " "
 
 # main
+
+# table formatting
+if gHtmlTable:
+    print """\n<style type=\"text/css\">
+.myTable { background-color:#eee;border-collapse:collapse; }
+.myTable th { background-color:#3f89de;color:white;; }
+.myTable td, .myTable th { padding:5px;border:1px solid #000; }
+</style>"""
+
 cli()
 #sys.exit()
 
 print "List installed files"
 print "==="
-
-if gHtmlTable:
-    print "<style type=\"text/css\"> \
-        .myTable { background-color:#eee;border-collapse:collapse; } \
-        .myTable th { background-color:#3f89de;color:white;; } \
-        .myTable td, .myTable th { padding:5px;border:1px solid #000; } \
-        </style>"
 
 for app in gAppList:
     listAppFiles(app)
