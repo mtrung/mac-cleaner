@@ -65,7 +65,7 @@ def getSizeWithUnit(size):
             foundUnit = unit
             break
     if foundUnit is None:
-        return "Zero\t"
+        return "Zero"
     if foundUnit[0] == 1.0:
         return "%d %s" % (size, foundUnit[1])
     return "%.2f %s" % (size/foundUnit[0], foundUnit[1])
@@ -93,17 +93,21 @@ def printWildcardFolderSizes(wildcardFolderStr):
         if os.path.isdir(filename):
             dirIndicator = '+'
         
-        indicator = ' '
-        if size > gAlertThreshold:
-            indicator = '*'                
 
         sizeStr = getSizeWithUnit(size)
         sizeStr2 = getFileSizeUsingDu(filename)
 
         if gHtmlTable:
-            print "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s %s</td></tr>" % (dirIndicator, sizeStr, sizeStr2, indicator, filename)
+            alertFormat = ""
+            if size > gAlertThreshold:
+                sizeStr = "<b>"+sizeStr+"</b>"
+                alertFormat = "class=\"highlight\""
+            print "<tr %s><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (alertFormat, dirIndicator, sizeStr, sizeStr2, filename)
         else:
-            print "%s %s\t%s\t%s %s" % (dirIndicator, sizeStr, sizeStr2, indicator, filename)
+            alertFormat = ' '
+            if size > gAlertThreshold:
+                alertFormat = '*'
+            print "%s %s %s\t%s\t%s" % (dirIndicator, alertFormat, sizeStr, sizeStr2, filename)
     
 
 # list app installed files in known locations
@@ -215,8 +219,10 @@ cli()
 if gHtmlTable:
     print """\n<style type=\"text/css\">
 .myTable { background-color:#eee;border-collapse:collapse; }
-.myTable th { background-color:#3f89de;color:white;; }
-.myTable td, .myTable th { padding:5px;border:1px solid #000; }
+.myTable th { background-color:#3f89de;color:white; }
+.myTable td, 
+.myTable th { padding:5px;border:1px solid #000; }
+.highlight { background: yellow; }
 </style>\n"""
 
 print "List installed files"
