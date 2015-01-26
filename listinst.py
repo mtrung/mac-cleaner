@@ -87,7 +87,7 @@ def getFileSizeUsingDu(filename):
     output = output.split()[0]
     return output
 
-def printWildcardFolderSizes(wildcardFolderStr):
+def printWildcardFolderSizes(wildcardFolderStr, app):
     listing = glob.glob(wildcardFolderStr)
     if (listing is None) or (len(listing) == 0):
         #print "  " + wildcardFolderStr + " not found"
@@ -99,7 +99,7 @@ def printWildcardFolderSizes(wildcardFolderStr):
         dirIndicator = '-'
         if os.path.isdir(filename):
             dirIndicator = '+'
-        
+
 
         sizeStr = getSizeWithUnit(size)
         sizeStr2 = getFileSizeUsingDu(filename)
@@ -109,13 +109,19 @@ def printWildcardFolderSizes(wildcardFolderStr):
             if size > gAlertThreshold:
                 sizeStr = "<b>"+sizeStr+"</b>"
                 alertFormat = "class=\"highlight\""
-            print "<tr %s><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (alertFormat, dirIndicator, sizeStr, sizeStr2, filename)
+            print "<tr %s><td>%s</td><td>%s</td><td>%s</td><td>%s</td>" % (alertFormat, dirIndicator, sizeStr, sizeStr2, filename)
+
+            desc = ""
+            if app.has_key('desc') == True:
+                desc = app['desc']
+            print "<td>%s</td></tr>" % (desc)
+
         else:
             alertFormat = ' '
             if size > gAlertThreshold:
                 alertFormat = '*'
             print "%s %s %s\t%s\t%s" % (dirIndicator, alertFormat, sizeStr, sizeStr2, filename)
-    
+
 
 # getSearchString: using 2 tier approach: app level & global level
 def getSearchString(app, appKey, appSearchKey):
@@ -144,8 +150,8 @@ def listAppFiles(app):
 
     if gHtmlTable:
         print "<table class='myTable'>"
-        print "<tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr>" % ('dir', 'Size', 'Usage', 'File')
- 
+        print "<tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr>" % ('dir', 'Size', 'Usage', 'File', 'Description')
+
 
     if appName != "":
         appName = getSearchString(app, "name", "nameSearchOption")
@@ -154,11 +160,12 @@ def listAppFiles(app):
             '/Library/Application Support/'+appName,
             USER_PATH+'/Library/Application Support/'+appName,
             USER_PATH+'/Library/Caches/'+appName,
+            USER_PATH+'/Library/Logs/'+appName,
             USER_PATH+'/Library/'+appName,
             USER_PATH+'/.'+appName.lower(),
         ]
         for wildcardFolderStr in wildcardFolderStrs:
-            printWildcardFolderSizes(wildcardFolderStr)        
+            printWildcardFolderSizes(wildcardFolderStr, app)
 
     if companyName != "":
         companyName = getSearchString(app, "company", "companySearchOption")
@@ -168,13 +175,13 @@ def listAppFiles(app):
             USER_PATH+'/Library/Caches/*.'+companyName,
             USER_PATH+'/Library/Saved Application State/*.'+companyName,
             # Mac App Store
-            USER_PATH+'/Library/Containers/*.'+companyName,            
+            USER_PATH+'/Library/Containers/*.'+companyName,
         ]
         for wildcardFolderStr in wildcardFolderStrs:
-            printWildcardFolderSizes(wildcardFolderStr)
+            printWildcardFolderSizes(wildcardFolderStr, app)
 
     if gHtmlTable:
-        print "</table>"                    
+        print "</table>"
 
 def readJsonFile(filename):
     if filename is None or filename == "":
@@ -189,7 +196,7 @@ def readJsonFile(filename):
         return False
 
     return True
-    #print json.dumps(gAppList, indent=2)    
+    #print json.dumps(gAppList, indent=2)
 
 # input: app list (in strings)
 def handleUserAppList(appList):
@@ -200,7 +207,7 @@ def handleUserAppList(appList):
     global gAppList
     gAppList = []
     for appName in appList:
-        gAppList += [{'name':appName}]       
+        gAppList += [{'name':appName}]
 
 # command line interface
 def cli():
@@ -208,7 +215,7 @@ def cli():
     parser.add_argument('-t','--htmltable', help='Use HTML table tag for output', action='store_true')
     parser.add_argument('-at','--alert_threshold',help='Highlight file/folder exceeding alert threshold (in MB).')
     parser.add_argument('-i','--input',help='Input JSON file containing list of apps')
-    parser.add_argument('-s','--search_option',help='Allow user to set search option. Options are ' + str(gSearchOptionDict.keys()))    
+    parser.add_argument('-s','--search_option',help='Allow user to set search option. Options are ' + str(gSearchOptionDict.keys()))
     parser.add_argument('apps', nargs='*', help='List of app names')
     args = parser.parse_args()
 
@@ -243,7 +250,7 @@ if gHtmlTable:
     print """\n<style type=\"text/css\">
 .myTable { background-color:#eee;border-collapse:collapse; }
 .myTable th { background-color:#3f89de;color:white; }
-.myTable td, 
+.myTable td,
 .myTable th { padding:5px;border:1px solid #000; }
 .highlight { background: yellow; }
 </style>\n"""
@@ -253,5 +260,3 @@ print "==="
 
 for app in gAppList:
     listAppFiles(app)
-
-

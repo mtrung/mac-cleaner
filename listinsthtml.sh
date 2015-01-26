@@ -1,5 +1,11 @@
 #!/bin/bash
 
-python listinst.py --htmltable -i listinst.json -a 700 > out.txt
-perl ~/Markdown.pl --html4tags out.txt > out.html
-open out.html
+outdir=~/dev/PetProjects/scripts/list_installed
+python $outdir/listinst.py --htmltable -i $outdir/listinst_dev.json -a 700 > $outdir/outListInstDev.txt
+python $outdir/listinst.py --htmltable -i $outdir/listinst.json -a 700 > $outdir/outListInst.txt
+
+perl ~/Markdown.pl --html4tags $outdir/outListInstDev.txt > $outdir/outListInstDev.html
+perl ~/Markdown.pl --html4tags $outdir/outListInst.txt > $outdir/outListInst.html
+
+open $outdir/outListInst.html
+open $outdir/outListInstDev.html

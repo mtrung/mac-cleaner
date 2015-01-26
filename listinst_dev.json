@@ -1,11 +1,11 @@
 [
    {
-      "company": "zennaware", 
+      "company": "zennaware",
       "name": "Cornerstone"
-   }, 
+   },
    {
       "name": "Developer"
-   }, 
+   },
    {
       "name": "iPhone Simulator"
    },
@@ -14,8 +14,10 @@
    },
    {
       "name": "NetBeans"
-   }, 
-   { "name": "Android" },   
-   { "name": "m2" },   
+   },
+   { "name": "Android",
+     "company": "android",
+     "companySearchOption":"contain" },
+   { "name": "m2" },
    { "name": "gradle" }
 ]
