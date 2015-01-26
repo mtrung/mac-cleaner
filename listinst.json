@@ -4,15 +4,15 @@
       "name": "TurboTax"
    }, 
    {
-      "name": "MobileSync",
-      "desc": "iTunes backup"
-   }, 
-   {
       "name": "Google"
    }, 
    {
       "name": "iTunes"
    }, 
+   {
+      "name": "MobileSync",
+      "desc": "iTunes backup"
+   },    
    {
       "name": "Parallels"
    },

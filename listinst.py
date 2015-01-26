@@ -109,12 +109,12 @@ def printWildcardFolderSizes(wildcardFolderStr, app):
             if size > gAlertThreshold:
                 sizeStr = "<b>"+sizeStr+"</b>"
                 alertFormat = "class=\"highlight\""
-            print "<tr %s><td>%s</td><td>%s</td><td>%s</td><td>%s</td>" % (alertFormat, dirIndicator, sizeStr, sizeStr2, filename)
+            print "<tr %s><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (alertFormat, dirIndicator, sizeStr, sizeStr2, filename)
 
-            desc = ""
-            if app.has_key('desc') == True:
-                desc = app['desc']
-            print "<td>%s</td></tr>" % (desc)
+            # desc = ""
+            # if app.has_key('desc') == True:
+            #     desc = app['desc']
+            # print "<td>%s</td></tr>" % (desc)
 
         else:
             alertFormat = ' '
@@ -146,11 +146,14 @@ def listAppFiles(app):
         companyName = app['company']
         titlePrintStr += " by " + companyName
 
+    if app.has_key('desc') == True:
+        titlePrintStr += " - " + app['desc']
+
     print titlePrintStr
 
     if gHtmlTable:
         print "<table class='myTable'>"
-        print "<tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr>" % ('dir', 'Size', 'Usage', 'File', 'Description')
+        print "<tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr>" % ('dir', 'Size', 'Usage', 'File')
 
 
     if appName != "":
