@@ -1,0 +1,6 @@
+[
+   { "name": "Developer/CoreSimulator"},
+   { "name": "Developer/Shared"},
+   { "name": "Developer/Xcode/DerivedData"},
+   { "name": "Developer/Xcode/iOS DeviceSupport"}
+]

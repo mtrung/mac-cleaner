@@ -3,18 +3,14 @@
       "company": "zennaware",
       "name": "Cornerstone"
    },
-   {
-      "name": "Developer"
-   },
-   {
-      "name": "iPhone Simulator"
-   },
-   {
-      "name": "Eclipse"
-   },
-   {
-      "name": "NetBeans"
-   },
+   { "name": "Developer/CoreSimulator"},
+   { "name": "Developer/Shared"},
+   { "name": "Developer/Xcode/DerivedData"},
+   { "name": "Developer/Xcode/iOS DeviceSupport"},
+   { "name": "iPhone Simulator"},
+   
+   { "name": "Eclipse"},
+   { "name": "NetBeans"},
    { "name": "Android",
      "company": "android",
      "companySearchOption":"contain" },
