@@ -221,12 +221,11 @@ def cli():
     parser.add_argument('-s','--search_option',help='Allow user to set search option. Options are ' + str(gSearchOptionDict.keys()))
     parser.add_argument('apps', nargs='*', help='List of app names')
     args = parser.parse_args()
+    global gHtmlTable
+    gHtmlTable = args.htmltable
 
     print "\n#### Inputs:"
     print "- User dir: " + USER_PATH
-
-    global gHtmlTable
-    gHtmlTable = args.htmltable
     print "- HtmlTable: ", gHtmlTable
 
     if gSearchOptionDict.has_key(args.search_option) == True:
