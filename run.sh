@@ -1,6 +1,6 @@
 #!/bin/bash
 
-outdir=output
+outdir=../mac-cleaner-out
 mkdir -p $outdir
 
 generateHtml() {
@@ -14,5 +14,6 @@ generateHtml() {
   open $outFile
 }
 
-generateHtml test.json
+if [ -z "$1" ]; then generateHtml test.json ; exit; fi
+generateHtml $1
 # open $outdir/outListInstDev.html
